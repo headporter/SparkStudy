@@ -16,7 +16,7 @@ object basic {
     val data = "./data"
     val df = spark.read.text(data)
     
-    //runUntypedDFTransformation(df)
+    runUntypedDFTransformation(df)
     runTypedDSTransformation(spark,df)
   }
     
@@ -25,7 +25,9 @@ object basic {
       import org.apache.spark.sql.functions._
       
       val wordDF = df.select(explode(split(col("value")," ")).as("word"))
-      val result = wordDF.groupBy("word").count()
+      val result = wordDF.groupBy("word")
+                        .count()
+                        .orderBy(desc("count"))
       result.show()
       result.printSchema()
     }
@@ -37,6 +39,7 @@ object basic {
       val result = ds.flatMap(_.split(" "))
                       .groupByKey(v => v)
                       .count()
+                      .orderBy($"count(1)".desc)
        result.show()               
     }
   
