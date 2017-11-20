@@ -27,9 +27,16 @@ row5 = Row(name='ha5', age=24, job='teacher')
 list1 = [row1, row2, row3, row4, row5]
 
 df = spark.createDataFrame(list1, schema)
-df.select(df.job, row_number().over(Window.partitionBy(df.job).orderBy(df.age)).alias('rownum')).show()
-df.where(df.age.isin(nums.value)).show()
 
+df.groupBy('job').agg(sum(df.age)).show()
+df.cube('age','job').agg(sum(df.age)).show()
+
+df.select(df.job, row_number().over(Window.partitionBy(df.job).orderBy(df.age)).alias('rownum')).show()
+df.alias('basic').select('basic.name').show()
+
+df.where(df.age.isin(nums.value)).show()
+df.select(max(df.age), min(df.age), mean(df.age)).show()
+df.agg(max(df.age), min(df.age), mean(df.age)).show()
 
 col = when(df.age % 2 == 0, 'even').otherwise('odd').alias('type')
 df.select(df.age, col).show()

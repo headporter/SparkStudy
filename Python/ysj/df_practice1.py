@@ -17,7 +17,7 @@ if __name__ == "__main__":
     wordDF.groupBy("word").count().show()
 
     
-    '''
+
     #Creating DataFrames
     df = spark.read.json("C:\\Users\\hadoop\\scala_workspace\\spark01\\src\\main\\resources\\people.json")
     df.show()
@@ -76,7 +76,6 @@ if __name__ == "__main__":
     schemaPeople.printSchema()
     results = spark.sql("SELECT name, age FROM people")
     results.show()
-    '''
     
     
     
