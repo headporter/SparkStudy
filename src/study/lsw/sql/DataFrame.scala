@@ -12,9 +12,17 @@ object DataFrame {
             .config("spark.driver.host", "127.0.0.1")
       .getOrCreate()
       
-    
+    createDF(spark)
     spark.stop()  
+    }
+  
+  def createDF(spark:SparkSession) {
+    import spark.implicits._
     
+    val sparkHomeDir = "./data"
+    val df = spark.read.csv(sparkHomeDir+"/person.csv")
+    
+    df.show()
   }
   
 }
