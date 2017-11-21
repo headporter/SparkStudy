@@ -13,25 +13,32 @@ object DataFrame {
             .config("spark.driver.host", "127.0.0.1")
       .getOrCreate()
       
-    createDF(spark)
+    val DFwithSchema = createDF(spark)
+    runBasicOpsEx(DFwithSchema)
     spark.stop()  
     }
   
-  def createDF(spark:SparkSession) {
+  def createDF(spark:SparkSession) : DataFrame = {
     import spark.implicits._
     
     val sparkHomeDir = "./data"
     val df = spark.read.csv(sparkHomeDir+"/person.csv")
     
-    df.show()
+    //df.show()
     
     val sf1 = StructField("name", StringType, nullable = true)
     val sf2 = StructField("age",  IntegerType, nullable = true)
     val sf3 = StructField("job",  StringType, nullable = false)
     val schema = StructType(List(sf1, sf2, sf3))
     
-    val df1 = spark.read.schema(schema).csv(sparkHomeDir+"/person.csv")
-    df1.show()
+    val DFwithSchema = spark.read.schema(schema).csv(sparkHomeDir+"/person.csv")
+   // DFwithSchema.show()
+    return DFwithSchema
+  }
+  
+  def runBasicOpsEx(df : DataFrame) {
+    df.show()
+    //df.head()
   }
   
 }
