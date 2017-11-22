@@ -21,7 +21,8 @@ object DataFrame {
     val dfWithSchema = createDF(spark)
     //runBasicOpsEx(dfWithSchema,spark)
     //runColEx(dfWithSchema,spark)
-    runIsinEx(dfWithSchema,spark,sc)
+    //runIsinEx(dfWithSchema,spark,sc)
+    runWhenEx(dfWithSchema)
     
     
     
@@ -95,6 +96,11 @@ object DataFrame {
         df("job") === inJobsCsv("_c0")
         ,"inner").show()   
   }
+  
+ def runWhenEx (df:DataFrame) {
+   val ageClass = when(df("age")>20, "old").otherwise("young").as("type")
+   df.select(df("name"),df("age"),ageClass).show()
+ }
   
   
   
