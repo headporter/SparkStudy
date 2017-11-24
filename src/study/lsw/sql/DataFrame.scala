@@ -25,7 +25,11 @@ object DataFrame {
     //runWhenEx(dfWithSchema)
     //runAggregationEx(dfWithSchema)
     //runDateFunctions(spark)
-    runOrderEx(spark,dfWithSchema)
+    //runOrderEx(spark,dfWithSchema)
+    //runUDF(spark,dfWithSchema)
+    //runDistinct(spark)
+    //runNull(dfWithSchema)
+    runWithCol(dfWithSchema)
     spark.stop()
   }
 
@@ -96,6 +100,7 @@ object DataFrame {
       df("job") === inJobsCsv("_c0"), "inner").show()
   }
 
+  //http://sqlandhadoop.com/spark-datafarme-when-case/
   def runWhenEx(df: DataFrame) {
     val ageClass = when(df("age") > 20, "old").otherwise("young").as("type")
     df.select(df("name"), df("age"), ageClass).show()
@@ -115,8 +120,8 @@ object DataFrame {
     doubleDF.select(collect_list("name")).show()
     doubleDF.select(collect_set("name")).show()
     doubleDF.select(count("name"), countDistinct("name")).show()
-    //doubleDF.cube("job").agg(sum("age"), grouping("job")).show
-
+    doubleDF.cube("job").agg(sum("age"), grouping("job")).show
+    doubleDF.groupBy("name", "job").agg("age" -> "sum").show()
   }
 
   def runDateFunctions(spark: SparkSession) {
@@ -124,7 +129,9 @@ object DataFrame {
     import spark.implicits._
     val dateTime = "2017-12-15 12:00:01"
     val date = "2017-12-15"
-
+    
+    println(System.currentTimeMillis())
+       
     val df = Seq((dateTime, date)).toDF("a", "b")
     df.show()
 
@@ -174,5 +181,55 @@ object DataFrame {
     df.sort(desc("age"),asc("name")).show()
     // desc_nulls_first, desc_nulls_last, asc_nulls_first, asc_nulls_last
     df.sort(asc_nulls_first("job")).show()
+  }
+  
+   def runUDF (spark : SparkSession, df : DataFrame) {
+     import spark.implicits._
+     
+     // use function
+     val caseWhen = udf((job : String) => job match {
+       case "student" => "poor"
+       case "teacher" => "better"  
+       case _ => "unknown"  
+         
+     })
+     df.select('name,'job,caseWhen('job)).show()
+   }
+   
+ def runDistinct(spark: SparkSession) {
+    import spark.implicits._
+    val d1 = ("store1", "note", 20, 2000)
+    val d2 = ("store1", "bag", 10, 5000)
+    val d3 = ("store1", "note", 20, 2000)
+    val d4 = ("store1", "note", 20, 2000)
+    val df = Seq(d1, d2, d3, d4).toDF("store", "product", "amount", "price")
+    df.distinct.show
+    df.dropDuplicates("store").show
+    df.dropDuplicates().show
+  }
+ 
+  def runIntersect(spark: SparkSession) {
+    val a = spark.range(1, 5).toDF
+    val b = spark.range(2, 6).toDF
+    val c = a.intersect(b)
+    c.show
+  }
+
+  def runExcept(spark: SparkSession) {
+    import spark.implicits._
+    val df1 = List(1, 2, 3, 4, 5).toDF
+    val df2 = List(2, 4).toDF
+    df1.except(df2).show
+  }
+
+  def runNull (df : DataFrame) {
+    df.na.drop().show()
+    df.na.fill(Map("job" -> "unknown")).show
+    df.na.replace("job",Map("teacher" -> "tt", "student" -> "ss" )).show
+  }
+  
+  def runWithCol (df : DataFrame) {
+    df.withColumn("addAge", df("age")+10).show
+    df.withColumnRenamed("name", "famillyname").show
   }
 }
