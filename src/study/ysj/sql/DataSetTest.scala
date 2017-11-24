@@ -2,7 +2,6 @@ package study.ysj.sql
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.ml
 import java.io.File
 
 case class Person(name: String, age: Int = 0, job: String = "")
