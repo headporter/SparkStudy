@@ -47,6 +47,8 @@ object DataFrame {
     val schema = StructType(List(sf1, sf2, sf3))
 
     spark.read.schema(schema).csv(sparkHomeDir + "/person.csv")
+    
+    
   }
 
   def runBasicOpsEx(df: DataFrame, spark: SparkSession) {
