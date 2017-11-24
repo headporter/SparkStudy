@@ -17,8 +17,8 @@ object DataSetTest {
       .getOrCreate()
     
     import spark.implicits._
-    import scala.util.control.Exception._
-    val srcDir = "./data"
+    
+    val srcDir = "data"
     val ds = spark
       .read
       .textFile(srcDir + File.separatorChar + "person.csv")
