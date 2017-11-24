@@ -3,8 +3,9 @@ package study.ysj.sql
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.ml
+import java.io.File
 
-case class Person(name: String, age: Int, job: String)
+case class Person(name: String, age: Int = 0, job: String = "")
 
 object DataSetTest {
   def main(args:Array[String]) = {
@@ -16,16 +17,28 @@ object DataSetTest {
       .getOrCreate()
     
     import spark.implicits._
+    import scala.util.control.Exception._
     val srcDir = "./data"
     val ds = spark
       .read
-      .textFile(srcDir + java.io.File.separatorChar + "person.csv")
+      .textFile(srcDir + File.separatorChar + "person.csv")
       .map(_.split(","))
-      .map{ case Array(name, age, job) => Person(name, age.toInt, job) }
+      .map{ case arr if arr.length == 1 => Person(arr(0))
+            case arr if arr.length == 2 => Person(arr(0), toInt(arr(1)))
+            case arr if arr.length == 3 => Person(arr(0), toInt(arr(1)), arr(2)) }
       .persist()
-      
+    
+    ds.show()
     ds.groupByKey(_.job).count().show(false)
     ds.groupByKey(_.job).agg(max("age").as[Int], countDistinct("age").as[Long]).show()
     ds.groupByKey(_.job).mapValues(p => p.name + "(" + p.age + ")").reduceGroups((s1, s2) => s1 + s2).show()
+  }
+  
+  def toInt(s: String): Int = {
+    try {
+      s.toInt
+    } catch {
+      case e: Exception => 0
+    }
   }
 }
