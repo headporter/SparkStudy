@@ -29,7 +29,8 @@ object DataFrame {
     //runUDF(spark,dfWithSchema)
     //runDistinct(spark)
     //runNull(dfWithSchema)
-    runWithCol(dfWithSchema)
+    //runWithCol(dfWithSchema)
+    runSave(dfWithSchema,spark)
     spark.stop()
   }
 
@@ -233,5 +234,11 @@ object DataFrame {
   def runWithCol (df : DataFrame) {
     df.withColumn("addAge", df("age")+10).show
     df.withColumnRenamed("name", "famillyname").show
+  }
+  
+  def runSave (df : DataFrame, spark : SparkSession) {
+    df.write.mode("overwrite").format("parquet").save("./result/df/")
+    val result = spark.read.load("./result/df/*.parquet")
+    result.printSchema()
   }
 }
