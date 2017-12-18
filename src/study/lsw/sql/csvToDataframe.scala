@@ -15,8 +15,8 @@ object csvToDataframe {
       .getOrCreate()
 
     val sc = spark.sparkContext
-    //val bankText = sc.textFile("./data/bank-full.csv")
-    val bankText = sc.textFile("/Users/1002516/20_Dev/zeppelin-0.7.3-bin-all/data/bank/bank-full.csv")
+    val bankText = sc.textFile("./data/bank-full.csv")
+    //val bankText = sc.textFile("/Users/1002516/20_Dev/zeppelin-0.7.3-bin-all/data/bank/bank-full.csv")
     println(bankText.count())
     //bankText.map(s => s.split(";"))
     
@@ -33,7 +33,7 @@ object csvToDataframe {
 
     val tbl = bank.toDF()
     tbl.show()
-    
+    tbl.printSchema()
 
   }
 
