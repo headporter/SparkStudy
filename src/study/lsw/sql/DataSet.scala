@@ -1,6 +1,6 @@
 package study.lsw.sql
 
-import org.apache.spark.sql.{Dataset, SparkSession,Encoders}
+import org.apache.spark.sql.{Dataset, SparkSession,DataFrame}
 import org.apache.spark.sql.functions._
 
 object DataSet {
@@ -12,17 +12,19 @@ object DataSet {
           .config("spark.driver.host","127.0.0.1")
           .getOrCreate()
           
-     val ds = createDS(spark)     
+     //val ds = createDS(spark)     
      //ds.show()   
      //ds.printSchema()
-     runSelectEx(spark,ds)
-     
+     //runSelectEx(spark,ds)
+     //createMissingDS(spark)
+     //ds1.printSchema()
      spark.stop()     
           
   }
 
- //case class Person (name : String, age : Long, Job : String)   
-  
+
+   org.apache.spark.sql.catalyst.encoders.OuterScopes.addOuterScope(this)
+   
   def createDS(saprk : SparkSession) : Dataset[Person] = {
        import saprk.implicits._
        
@@ -33,6 +35,26 @@ object DataSet {
     .map{ case Array(name, age, job) => Person(name, age.toInt, job) }
   }
   
+   def createMissingDS(saprk : SparkSession) { //: Dataset[Person] = {
+       import saprk.implicits._
+     
+
+    val sparkHomeDir = "./data"
+   // val ds2 = saprk.read.option("header", "true").option("inferSchema",true).csv(sparkHomeDir + "/person.csv").as[Person]
+    val ds2 = saprk.read
+    .option("header", false)
+                  .option("inferSchema",true)
+                  .csv(sparkHomeDir + "/person.csv")
+                  .toDF("name", "age", "Job")//
+                  .as[Person]   
+    //  val ds2 =saprk.read.option("header", "true").csv(sparkHomeDir + "/person.csv")
+     ds2.printSchema() 
+     ds2.show()
+    //.option("delimiter",",")
+    //.map{ case Array(name, age, job) => Person(name, age.toInt, job) }
+  }
+  
+    
   def runSelectEx(spark : SparkSession, ds:Dataset[Person]) {
     import spark.implicits._
     ds.select(ds("name")).show()

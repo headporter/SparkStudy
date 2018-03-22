@@ -1,0 +1,4 @@
+id,width,height,depth,material,color
+5,1.0,1.0,1.0,wood,brown
+6,2.0,2.0,2.0,glass,green
+7,3.0,3.0,3.0,metal,blue

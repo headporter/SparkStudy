@@ -237,7 +237,9 @@ object DataFrame {
   }
   
   def runSave (df : DataFrame, spark : SparkSession) {
-    df.write.mode("overwrite").format("parquet").save("./result/df/")
+    //import spark.implicits._
+    //http://knight76.tistory.com/entry/scala-spark%EC%97%90%EC%84%9C-partition-%EC%A4%84%EC%9D%B4%EA%B8%B0-repartition-coalesce
+    df.coalesce(1).write.mode("overwrite").format("parquet").save("./result/df/")
     val result = spark.read.load("./result/df/*.parquet")
     result.printSchema()
   }
